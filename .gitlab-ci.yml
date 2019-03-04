@@ -14,26 +14,15 @@ test:
     - master
 
 pages:
+  stage: deploy
   script:
   - apt-get update -yqqq
   - apt-get install -y nodejs
   - bundle install --path vendor
+  - mkdir public
   - bundle exec middleman build
   artifacts:
     paths:
     - public
   only:
   - master
-  
-pages:
-  stage: deploy
-  script:
-  - mkdir .public
-  - cp -r * .public
-  - mv .public public
-  artifacts:
-    paths:
-    - public
-  only:
-  - master
-

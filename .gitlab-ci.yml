@@ -6,11 +6,56 @@ cache:
   paths:
     - vendor/
 
+stages:
+  - test
+  - deploy
+
 before_script:
   - apt-get update -qy
   - apt-get install -y nodejs # requires JS runtime
   - mkdir public
-  - bundle install --without development --path vendor # For "--without development", see Gemfile
+  - bundle install --jobs 4 --path vendor
+
+review:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  cache: {}
+  script:
+    - rsync -av --delete public /srv/nginx/pages/$CI_BUILD_REF_NAME
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    url: http://$CI_BUILD_REF_NAME.$APPS_DOMAIN
+    on_stop: review_stop
+  only:
+    - branches
+  except:
+    - master
+  tags:
+    - review-apps
+
+## Stop the review app
+review_stop:
+  stage: deploy
+  variables:
+    GIT_STRATEGY: none
+  before_script: []
+  artifacts: {}
+  cache: {}
+  script:
+    - rm -rf public /srv/nginx/pages/$CI_BUILD_REF_NAME
+  dependencies: []
+  when: manual
+  environment:
+    name: review/$CI_BUILD_REF_NAME
+    action: stop
+  only:
+    - branches
+  except:
+    - master
+  tags:
+    - review-apps
 
 # add a job called 'test' -> non-required
 test:

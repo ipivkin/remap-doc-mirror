@@ -12,7 +12,7 @@ stages:
 
 before_script:
   - apt-get update -qy
-  - apt-get install -y nodejs # requires JS runtime
+  - apt-get install -y nodejs rsync # requires JS runtime
   - mkdir public
   - bundle install --jobs 4 --path vendor
 
@@ -23,6 +23,7 @@ review:
   before_script: []
   cache: {}
   script:
+    - apt-get install -y rsync
     - rsync -av --delete public /srv/nginx/pages/$CI_BUILD_REF_NAME
   environment:
     name: review/$CI_BUILD_REF_NAME

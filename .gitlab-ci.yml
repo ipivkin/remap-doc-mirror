@@ -1,0 +1,13 @@
+image: alpine
+image: ruby:2.5.1
+
+pages:
+  script:
+  - apk --no-cache add gem nodejs
+  - bundle install
+  - bundle exec middleman server
+  artifacts:
+    paths:
+    - public
+  only:
+  - master

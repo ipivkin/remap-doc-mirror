@@ -1,46 +1,59 @@
-# Activate and configure extensions
-# https://middlemanapp.com/advanced/configuration/#configuring-extensions
+# Unique header generation
+require './lib/unique_head.rb'
 
-activate :autoprefixer do |prefix|
-  prefix.browsers = "last 2 versions"
+# Markdown
+set :markdown_engine, :redcarpet
+set :markdown,
+    fenced_code_blocks: true,
+    smartypants: true,
+    disable_indented_code_blocks: true,
+    prettify: true,
+    strikethrough: true,
+    tables: true,
+    with_toc_data: true,
+    no_intra_emphasis: true,
+    renderer: UniqueHeadCounter
+
+# Assets
+set :css_dir, 'stylesheets'
+set :js_dir, 'javascripts'
+set :images_dir, 'images'
+set :fonts_dir, 'fonts'
+set :build_dir, 'build/api/remap/1.2/ru'
+
+# Activate the syntax highlighter
+activate :syntax
+ready do
+  require './lib/multilang.rb'
 end
 
-# Layouts
-# https://middlemanapp.com/basics/layouts/
+activate :sprockets
 
-# Per-page layout changes
-page '/*.xml', layout: false
-page '/*.json', layout: false
-page '/*.txt', layout: false
+activate :autoprefixer do |config|
+  config.browsers = ['last 2 version', 'Firefox ESR']
+  config.cascade  = false
+  config.inline   = true
+end
 
-# With alternative layout
-# page '/path/to/file.html', layout: 'other_layout'
+# Github pages require relative links
+activate :relative_assets
+set :relative_links, true
 
-# Proxy pages
-# https://middlemanapp.com/advanced/dynamic-pages/
+# Build Configuration
+configure :build do
+  # If you're having trouble with Middleman hanging, commenting
+  # out the following two lines has been known to help
+  activate :minify_css
+  activate :minify_javascript
+  # activate :relative_assets
+  # activate :asset_hash
+  # activate :gzip
+end
 
-# proxy(
-#   '/this-page-has-no-template.html',
-#   '/template-file.html',
-#   locals: {
-#     which_fake_page: 'Rendering a fake page with a local variable'
-#   },
-# )
+# Deploy Configuration
+# If you want Middleman to listen on a different port, you can set that below
+set :port, 4567
 
-# Helpers
-# Methods defined in the helpers block are available in templates
-# https://middlemanapp.com/basics/helper-methods/
-
-# helpers do
-#   def some_helper
-#     'Helping'
-#   end
-# end
-
-# Build-specific configuration
-# https://middlemanapp.com/advanced/configuration/#environment-specific-settings
-
-# configure :build do
-#   activate :minify_css
-#   activate :minify_javascript
-# end
+helpers do
+  require './lib/toc_data.rb'
+end

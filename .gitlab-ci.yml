@@ -9,6 +9,7 @@ cache:
 before_script:
   - apt-get update -qy
   - apt-get install -y nodejs # requires JS runtime
+  - mkdir public
   - bundle install --without development --path vendor # For "--without development", see Gemfile
 
 # add a job called 'test' -> non-required
@@ -23,7 +24,7 @@ test:
 pages:
   stage: deploy
   script:
-    - bundle exec middleman build
+    - bundle exec middleman build --build-dir=public --verbose
   artifacts:
     paths:
       - public

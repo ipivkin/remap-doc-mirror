@@ -10,6 +10,7 @@ before_script:
   - apt-get update -qy
   - apt-get install -y nodejs # requires JS runtime
   - bundle install --without development --path vendor # For "--without development", see Gemfile
+  - bundle && bundle exec middleman init .
 
 # add a job called 'test' -> non-required
 test:

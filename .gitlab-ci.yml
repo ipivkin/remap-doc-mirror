@@ -1,12 +1,24 @@
 image: ruby:2.5.1
 
-before_script:
-  - bundle install
+cache:
+  paths:
+  - vendor
+
+test:
+  script:
+  - apt-get update -yqqq
+  - apt-get install -y nodejs
+  - bundle install --path vendor
+  - bundle exec middleman build
+  except:
+    - master
 
 pages:
-  stage: deploy
   script:
-  - bundle exec middleman build --build-dir=public
+  - apt-get update -yqqq
+  - apt-get install -y nodejs
+  - bundle install --path vendor
+  - bundle exec middleman build
   artifacts:
     paths:
     - public

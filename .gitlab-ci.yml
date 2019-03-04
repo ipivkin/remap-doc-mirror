@@ -6,7 +6,7 @@ before_script:
 pages:
   stage: deploy
   script:
-  - bundle exec middleman build -d public
+  - bundle exec middleman build public
   artifacts:
     paths:
     - public

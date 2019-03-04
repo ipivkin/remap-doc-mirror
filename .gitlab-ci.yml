@@ -12,7 +12,7 @@ stages:
 
 before_script:
   - apt-get update -qy
-  - apt-get install -y nodejs # requires JS runtime
+  - apt-get install -y nodejs rsync # requires JS runtime
   - mkdir public
   - bundle install --jobs 4 --path vendor
 

@@ -23,6 +23,7 @@ review:
   before_script: []
   cache: {}
   script:
+    - apt-get install -y rsync
     - rsync -av --delete public /srv/nginx/pages/$CI_BUILD_REF_NAME
   environment:
     name: review/$CI_BUILD_REF_NAME

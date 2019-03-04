@@ -1,28 +1,31 @@
-image: ruby:2.5.1
+# requiring the environment of Ruby 2.1.x
+image: ruby:2.1
 
+# add bundle cache to 'vendor' for speeding up builds
 cache:
   paths:
-  - vendor
+    - vendor/
 
+before_script:
+  - apt-get update -qy
+  - apt-get install -y nodejs # requires JS runtime
+  - bundle install --without development --path vendor # For "--without development", see Gemfile
+
+# add a job called 'test' -> non-required
 test:
+  stage: test
   script:
-  - apt-get update -yqqq
-  - apt-get install -y nodejs
-  - bundle install --path vendor
-  - bundle exec middleman build
+    - bundle exec middleman build
   except:
-    - master
+    - master # the 'test' job will affect all branches expect 'master'
 
+# the 'pages' job will deploy and build your site to the 'public' path
 pages:
   stage: deploy
   script:
-  - apt-get update -yqqq
-  - apt-get install -y nodejs
-  - bundle install --path vendor
-  - mkdir public
-  - bundle exec middleman build
+    - bundle exec middleman build
   artifacts:
     paths:
-    - public
+      - public
   only:
-  - master
+    - master # this job will affect only the 'master' branch

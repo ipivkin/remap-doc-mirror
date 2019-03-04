@@ -1,62 +1,106 @@
-Запуск локальной версии документации
-------------
+![Middleman Version](https://img.shields.io/badge/Middleman-4.1.1-yellow.svg)
+![Build Status](https://gitlab.com/middleman-themes/middleman/badges/master/build.svg)
 
-_Чтобы локально развернуть копию документации:_
+----
 
-1. Установить docker CE и docker-compose, следуя инструкциям на https://docs.docker.com/ для своей ОС
-2. Склонировать репозиторий `https://github.com/moysklad/doc.git`
-3. В командной строке, перейдите в папку репозитория.
-4. Выполните команды `docker-compose build` `docker-compose up`
+View site: https://middleman-themes.gitlab.io/middleman/
 
-Локальная версия документации будет доступна по адресу `http://localhost:4567`
+----
 
-Основная версия документации доступна по адресу https://moysklad.github.io/doc/api/remap/1.2/ru/
+# Build a [Middleman] site with GitLab Pages
 
-## Описание репозитория и структуры документации
+## Configurations:
 
-В ветке `master` находится версия документации, развёрнутая на продуктовом сервере. После мерджа измений в мастер необходимо запустить скрипт `deploy.sh`, чтобы сделанные изменения стали доступны пользователям.
+- Theme: Middleman Default Theme provided via `middleman init project` (with small adaptations)
+- Build method: with [Bundler] - `bundle exec middleman build`
+- GitLab CI - view [`.gitlab-ci.yml`]
+- Bundler - view [`Gemfile`][Gemfile]
+- Middleman - view [`config.rb`]
 
-В папке `source/includes` находятся .md-файлы документации.
 
-## Оформление нового раздела
+## Usage:
 
-Для добавления нового раздела необходимо создать .md-файл в папке `source/includes`. Имя файла должно начинаться с `_`. Для отображения нового раздела в боковом меню в `source/index.html.md` в раздел `includes` нужно прописать название нового раздела (должно совпадать с названием .md-файла).
+_**Note:** we assume you have [Middleman 4.1.1] installed, up and running locally._
 
-Пример разметки страницы:
+- Fork, clone or download this project
+- Install [Bundler] if you don't have it already - `gem install bundler`
+- Open the [Gemfile] and add or remove gems to work locally on the group `development`
+- Configure [`config.rb`] according to your project
+- Navigate to the project folder (`cd path/to/project`)
+- Run `bundle install`
+- Serve middleman with bundler - `bundle exec middleman server` and/or
+- Build Middleman with bundler - `bundle exec middleman build`
+
+## Notes:
+
+- You won't need the gems in the [`development` group][Gemfile] for deploying your site remotely, that's why
+we isolated them. See [Bundler groups documentation][b-doc] for reference.
+- About `config.rb`: do NOT change the line 39: `set :build_dir, 'public'` otherwise GitLab Pages will not work with your new project.
+- About the theme: we slightly addapted the default theme by adding a custom [stylesheet] and an [extra page].
+
+----
+
+## Working with other Middleman Themes:
+
+Some projects might need other gems or configurations to work, locally or remotelly. But, generally, what you can't miss to use Middleman with GitLab Pages is:
+
+- Make sure you set the build path to `public` on `config.rb` (`set :build_dir, 'public'`)
+- Make sure you have the `.giltab-ci.yml` with the following minimal configurations:
+
+
+```yaml
+# requiring the environment of Ruby 2.1.x
+image: ruby:2.1
+
+# add bundle cache to 'vendor' for speeding up builds
+cache:
+  paths: 
+    - vendor/
+
+before_script:
+  - apt-get update -qy
+  - apt-get install -y nodejs # JS runtime
+  - bundle install --path vendor # view notes for adding the flag '--without development'
+
+# the 'pages' job will deploy and build your site to the 'public' path
+pages:
+  stage: deploy
+  script:
+    - bundle exec middleman build
+  artifacts:
+    paths:
+      - public
+  only:
+    - master # this job will affect only the 'master' branch
 ```
-## Заголовок раздела
 
-### Название сущности
-Описание сущности
+----
 
-#### Атрибуты сущности
-Описание аттрибутов сущности
-+ **attribute** - описание аттрибута
+## FAQ
 
-#### Атрибуты доступные для фильтрации
-При необходимости
+### Do I need the `development` group in my `Gemfile`?
 
-#### Атрибуты доступные для сортировки
-При необходимости
+No, you don't. Set it up as you wish. 
 
-### Получить Сущности
+If you don't group the gems, your GitLab CI [configuration file][`.gitlab-ci.yml`] won't need the flag `--without development`.
 
-**Параметры**
+### Why do I need this: `set :build_dir, 'public'` ?
 
-| Параметр                | Описание  |
-| ------------------------------ |:---------------------------|
-|parameter |  Описание параметра |
+The default build directory for Middleman is called `build` but GitLab Pages is set 
+to build the site from the `public` directory. So we need to tell Middleman to build the site
+to the `public` folder instead.
 
-> Получить Сущности 
+----
 
-curl -X GET
-  "https://online.moysklad.ru/api/remap/1.2/entity/some_entity"
-  -H "Authorization: Basic <Access-Token>"
+## Enjoy!
 
 
-> Response 200 (application/json)
-Успешный запрос. Результат - JSON представление списка Сущностей
-
-JSON ответа от сервера
-
-```
+[Bundler]: http://bundler.io
+[b-doc]: http://bundler.io/v1.11/groups.html
+[Middleman]: https://middlemanapp.com/
+[Middleman 4.1.1]: https://rubygems.org/gems/middleman/versions/4.1.1
+[`config.rb`]: https://gitlab.com/middleman-themes/middleman/blob/master/config.rb
+[Gemfile]: https://gitlab.com/middleman-themes/middleman/blob/master/Gemfile
+[`.gitlab-ci.yml`]: https://gitlab.com/middleman-themes/middleman/blob/master/.gitlab-ci.yml
+[stylesheet]: https://gitlab.com/middleman-themes/middleman/blob/master/source/stylesheets/_custom.scss
+[extra page]: https://gitlab.com/middleman-themes/middleman/blob/master/source/hello-world.html.erb

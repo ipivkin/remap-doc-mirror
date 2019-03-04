@@ -1,2 +1,1 @@
-//= require ./all_nosearch
-//= require ./app/_search
+// This is where it all goes :)

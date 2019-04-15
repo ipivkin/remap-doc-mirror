@@ -6,7 +6,7 @@ language_tabs: # must be one of https://git.io/vQNgJ
 
 
 toc_footers:
-  - <a href='https://github.com/lord/slate'>Documentation Powered by Slate32432</a>
+  - <a href='https://github.com/lord/slate'>Documentation Powered by Slate3243232</a>
 
 includes:
   - general

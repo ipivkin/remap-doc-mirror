@@ -8,13 +8,12 @@ rvm:
 cache: bundler
 
 script:
-  - bash deploy.sh
+  - bundle exec middleman build --clean --build-dir=build
 
-before_deploy: git config --global user.email $USER_MAIL && git config --global user.name $USER_NAME
 deploy:
   provider: pages
   skip_cleanup: true
-  local_dir : public
+  local_dir : build/
   github_token: $GITHUB_TOKEN
   target_branch : gh-pages
   on:
